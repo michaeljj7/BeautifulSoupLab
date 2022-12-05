@@ -2,9 +2,16 @@
 from bs4 import BeautifulSoup
 import requests
 import json
+#dfrom flask import Flask, render_template
+
+#app = Flask(__name__)
+#@app.route("/")
+def displayJobDetails():
+    #write a code to give call to json file and then render html page
+
+    return render_template('index.html',responseJSON = responseJSON)
 
 #function to get job list from url f'https://www.talent.com/jobs?k={role}&l={location}'
-
 def getJobList(role,location):
     url = f'https://www.talent.com/jobs?k={role}&l={location}'
     # Complete the missing part of this function here
@@ -24,12 +31,10 @@ def getJobList(role,location):
         for child in companyName:
             companyName = child
             break
-        companyName = companyName.string
+        companyName = companyName.string.strip()
         
         # find job description
         description = link.find('p', class_='card__job-snippet').string.strip()
-        # append descriptions to list
-        job_descriptions.append(description)
         
         # find salary
         salary = link.find('div', class_='card__job-badge-salary')
@@ -37,16 +42,19 @@ def getJobList(role,location):
         if salary == None:
             salary = "Salary not listed"
         else:
-            salary = salary.string
+            salary = salary.string.strip()
         
-        # print out info
-        print("\n\nJob Title: " + jobTitle + "\nCompany Name: " + companyName + "\nDescription: " + description + "\nSalary: " + salary)
-    print("\n\n")
+        # append info to list and print out
+        jobInfo = "Job Title: " + jobTitle + "\nCompany Name: " + companyName + "\nDescription: " + description + "\nSalary: " + salary
+        job_descriptions.append(jobInfo)
+        print(jobInfo + "\n\n")
     return job_descriptions
 
 #save data in JSON file
 def saveDataInJSON(jobDetails):
     #Complete the missing part of this function here
+    for i in range(len(jobDetails)):
+        jobDetails[i] = jobDetails[i].replace("\n",", ")
     json_file = open("jobDetails.json", "w")
     json.dump(jobDetails, json_file)
     json_file.close()
@@ -63,7 +71,6 @@ def main():
     print("\nYou entered: " + role + ", " + location + ".\n")
 
     jobDetails = getJobList(role, location) 
-    print(jobDetails)
     saveDataInJSON(jobDetails)
 
 if __name__ == '__main__':
