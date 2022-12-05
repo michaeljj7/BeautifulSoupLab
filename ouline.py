@@ -28,14 +28,8 @@ def main():
     print("Enter desired location")
     location = input()
 
-    jobDetails = getJobList(role, location)
-    #job_list_file = 
+    jobDetails = getJobList(role, location) 
     saveDataInJSON(jobDetails)
-    #f = open(job_list_file, 'r')
-    #job_list = f.read()
 
-    #print("Available " + role + " roles: \n" + job_list)
-    #f.close()
-    
 if __name__ == '__main__':
     main()
