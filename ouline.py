@@ -2,14 +2,16 @@
 from bs4 import BeautifulSoup
 import requests
 import json
-#dfrom flask import Flask, render_template
+from flask import Flask, render_template
 
-#app = Flask(__name__)
-#@app.route("/")
-def displayJobDetails():
+app = Flask(__name__)
+@app.route("/")
+def index():
     #write a code to give call to json file and then render html page
-
-    return render_template('index.html',responseJSON = responseJSON)
+    response = requests.get('https://raw.githubusercontent.com/michaeljj7/BeautifulSoupLab/main/jobDetails.json')
+    response = json.loads(response.text)
+    #jlist = ["pee pee", "poo poo?"]
+    return render_template('index.html', jobsList = response)
 
 #function to get job list from url f'https://www.talent.com/jobs?k={role}&l={location}'
 def getJobList(role,location):
@@ -48,21 +50,24 @@ def getJobList(role,location):
         jobInfo = "Job Title: " + jobTitle + "\nCompany Name: " + companyName + "\nDescription: " + description + "\nSalary: " + salary
         job_descriptions.append(jobInfo)
         print(jobInfo + "\n\n")
+    for i in range(len(job_descriptions)):
+        job_descriptions[i] = job_descriptions[i].replace("\n",", ")
     return job_descriptions
 
 #save data in JSON file
 def saveDataInJSON(jobDetails):
     #Complete the missing part of this function here
-    for i in range(len(jobDetails)):
-        jobDetails[i] = jobDetails[i].replace("\n",", ")
     json_file = open("jobDetails.json", "w")
     json.dump(jobDetails, json_file)
     json_file.close()
-    print("Saved job details to JSON file.")
+    return json_file
 
 #main function
 def main():
     # Write a code here to get job location and role from user e.g. role = input()
+    response = requests.get('https://raw.githubusercontent.com/michaeljj7/BeautifulSoupLab/main/jobDetails.json')
+    response = json.loads(response.text)
+    print(response)
     print("Enter role you want to search")
     role = input()
     # Complete the missing part of this function here
@@ -72,6 +77,8 @@ def main():
 
     jobDetails = getJobList(role, location) 
     saveDataInJSON(jobDetails)
+    print("Saved job details to JSON file.")
 
 if __name__ == '__main__':
-    main()
+    #main()
+    app.run(host='127.0.0.1', port=8000, debug=True)
